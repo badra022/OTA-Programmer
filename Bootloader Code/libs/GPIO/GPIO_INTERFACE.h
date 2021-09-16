@@ -7,8 +7,6 @@
 #ifndef GPIO_INTERFACE_H_
 #define GPIO_INTERFACE_H_
 
-#define HIGH    1
-#define LOW     0
 
 #define HIGH_PORTL 0x00FF
 #define HIGH_PORTH 0xFF00

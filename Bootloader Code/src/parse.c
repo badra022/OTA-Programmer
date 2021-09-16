@@ -4,15 +4,17 @@
  *  Created on: Oct 13, 2020
  *      Author: Ahmed
  */
-#include "STD_TYPES.h"
-#include "BIT_MATH.h"
+#include "TYPES.h"
+#include "MACROS.h"
+#include "ERROR_STATUS.h"
 
-#include "FPEC_interface.h"
+#include "parse.h"
+#include "FPEC_INTERFACE.h"
 
 u16 Data[100] = {0};
 u32 Address= 0x08000000;
 
-u8 AsciToHex(u8 Copy_u8Asci)
+static u8 AsciToHex(u8 Copy_u8Asci)
 {
 	u8 Result;
 	if ( (Copy_u8Asci >= 48) && (Copy_u8Asci <= 57) )
@@ -29,7 +31,7 @@ u8 AsciToHex(u8 Copy_u8Asci)
 }
 
 
-void ParseData(u8* Copy_u8BufData)
+static void ParseData(u8* Copy_u8BufData)
 {
 	u8 DigitLow,DigitHigh,CC,i;
 	u8 DataDigit0,DataDigit1,DataDigit2,DataDigit3;
@@ -64,7 +66,7 @@ void ParseData(u8* Copy_u8BufData)
 	FPEC_voidFlashWrite(Address,Data);
 }
 
-void ParseUpperAddress(u8* Copy_u8BufData)
+static void ParseUpperAddress(u8* Copy_u8BufData)
 {
 //	u8 DataDigit0,DataDigit1,DataDigit2,DataDigit3;
 //

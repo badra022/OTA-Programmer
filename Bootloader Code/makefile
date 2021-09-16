@@ -11,45 +11,47 @@
 
 # parameters (change this stuff accordingly)
 # project name
-PRJ = main
+PRJ = bootloader
 # avr mcu
 CPU = cortex-m3
 # program source files (not including external libraries)
-SRC = $(PRJ).c
+SRC = src/$(PRJ).c
 # where to look for external libraries (consisting of .c files and .h files)
 # e.g. PERIPH = GPIO RCC ...
-PERIPH = LIB RCC GPIO SYSTICK DELAY LEDS BUTTONS TFT IR SPI NVIC EXTI AFIO
+PERIPH = RCC GPIO AFIO SYSTICK DELAY NVIC USART WIFI FPEC
 # output folder name
 BIN = bin
 # object files folder name
 OBJ_FOLDER = obj
 # path to used drivers (which is Not standard)
-USED_PERIPH = ../STM32F10x_imtPeriph
+USED_PERIPH = ./libs
 
 EXT := $(foreach dir, $(PERIPH), $(USED_PERIPH)/$(dir))
-# # we will add also the path to linker file .ld and startup assembly code
-# EXT += ../STM32F10x_myPeriph/
+# we will add also the path to linker file, startup and common includes
+EXT += ./includes/
 
-# add path to standard peripherals lib
-EXT += .././STM32F10x_StdPeriph_Lib_V3.5.0
-EXT += .././STM32F10x_StdPeriph_Lib_V3.5.0/CMSIS/Device/ST/STM32F10x/Include
-EXT += .././STM32F10x_StdPeriph_Lib_V3.5.0/CMSIS/Include
-EXT += .././STM32F10x_StdPeriph_Lib_V3.5.0/Libraries/inc
-EXT += .././STM32F10x_StdPeriph_Lib_V3.5.0/Libraries/src
+EXT += ./src/
+
+# # add path to standard peripherals lib
+# EXT += .././STM32F10x_StdPeriph_Lib_V3.5.0
+# EXT += .././STM32F10x_StdPeriph_Lib_V3.5.0/CMSIS/Device/ST/STM32F10x/Include
+# EXT += .././STM32F10x_StdPeriph_Lib_V3.5.0/CMSIS/Include
+# EXT += .././STM32F10x_StdPeriph_Lib_V3.5.0/Libraries/inc
+# EXT += .././STM32F10x_StdPeriph_Lib_V3.5.0/Libraries/src
 
 # include path
 INCLUDE := $(foreach dir, $(EXT), -I$(dir))
 # c flags
 CFLAGS  = -g -O2 -Wall $(INCLUDE)
-CFLAGS += -T../STM32F10x_StdPeriph_Lib_V3.5.0/stm32_flash.ld
+CFLAGS += -T./includes/stm32_flash.ld
 CFLAGS += -mlittle-endian -mthumb -mcpu=$(CPU) -mthumb-interwork -std=gnu11
-CFLAGS += -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER
+CFLAGS += -DSTM32F10X_MD
 CFLAGS += -Wl,--gc-sections
 
 # executables
-OBJCOPY 	= .././ArmGCC/bin/arm-none-eabi-objcopy.exe
-CC			= .././ArmGCC/bin/arm-none-eabi-gcc.exe
-SIZE		=.././ArmGCC/bin/arm-none-eabi-size
+OBJCOPY 	= C:\ArmGCC\bin/arm-none-eabi-objcopy.exe
+CC			= C:\ArmGCC\bin/arm-none-eabi-gcc.exe
+SIZE		= C:\ArmGCC\bin/arm-none-eabi-size
 
 # generate list of objects
 CFILES    = $(filter %.c, $(SRC))

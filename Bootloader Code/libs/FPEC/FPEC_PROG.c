@@ -20,11 +20,11 @@ void MFPEC_VidInit(void){
  /* default (empty) */
 }
 
-void MFPEC_VidWriteFlash(u16* Copy_Binary){
+void MFPEC_VidWriteAllFlash(u16* Copy_Binary){
   u16 N = sizeof(Copy_Binary)/sizeof(*Copy_Binary);
 
   /* init the targetAddress to first u16 element of the Binary file (array) */
-  u16* targetAddress = APPLICATION_CODE_FLASH_BASE_ADDRESS;
+  u16* targetAddress = (u16*)APPLICATION_CODE_FLASH_BASE_ADDRESS;
 
   if(N < 60000){    /* MAX Code Size is 60 Kbytes */
     while(GET_BIT(FLASH->CR, 7) == HIGH){
@@ -92,8 +92,6 @@ static ErrorStatus MFPEC_VidErasePage(u8 Copy_pageID){
   SET_BIT(FLASH->SR, 5);    /* clear EOP (End of Operation flag) */
   CLR_BIT(FLASH->CR, 1);    /* this is an important step to Deselect the programming mode if you will execute some normal code between flash writes */
 
-  ErrorStatus state = OK;
-
   for(u32 i = 0; i<1024;i++){
     if(*(volatile u8*)(pageAddress + i) != 0x0FF){
       return NOK;
@@ -108,8 +106,7 @@ void MFPEC_VidEraseFlash(void){
   u8 pageID = 4;    /* begin with fifth Page that is the start Page of the preserved Memory of the Application */
 
   while(pageID < 64){
-    ErrorStatus state = MFPEC_VidErasePage(pageID);   /*  Erase the Page */
-    if(state == OK){
+    if(MFPEC_VidErasePage(pageID) == OK){       /*  Erase the Page */
       pageID++;   /* if the Page Erased successfully, Proceed to the next Page */
     }
   }

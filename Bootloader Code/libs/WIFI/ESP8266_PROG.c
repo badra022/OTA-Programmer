@@ -16,7 +16,7 @@
 u8 volatile Iterator = 0  ;
 u8 volatile DataCome[200] ;
 
-void MUSART_CallBack ( void ){
+void UART_receiveCallBack ( void ){
 
 	/* Receive ESP8266 Response */
 	DataCome[ Iterator ] = MUSART1_u8ReadDataRegister();
@@ -29,7 +29,7 @@ void MUSART_CallBack ( void ){
 void ESP8266_VidInit ( void ){
 
 	/* Set USART1 CallBack To Receive The Response Of The ESP8266 */
-	MUSART1_VidSetCallBack( MUSART_CallBack );
+	MUSART1_VidSetCallBack( UART_receiveCallBack );
 
 	/* Sending AT Command To Check ESP8266 Is Working Or Not  */
 	MUSART1_VidSendStringSynch( (u8 *)"AT\r\n" );

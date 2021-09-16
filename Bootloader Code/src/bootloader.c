@@ -1,6 +1,6 @@
 /***********************************************************
  * 	brief:	Main Application file for UART Bootloader Code 
- *	Time:	15/9/21
+ *	Time:	16/9/21
  *	Author: Ahmed Badra
  ***********************************************************/
 #include "TYPES.h"
@@ -11,7 +11,8 @@
 #include "GPIO_INTERFACE.h"
 #include "SYSTICK_INTERFACE.h"
 #include "USART_INTERFACE.h"
-#include "FPEC_INTERFACE.h"
+#include "ESP8266_INTERFACE.h"
+#include "parse.h"
 
 #define SCB_VTOR   *((volatile u32*)0xE000ED08)
 void Parser_voidParseRecord(u8* Copy_u8BufData);
@@ -32,14 +33,14 @@ void func(void)
 }
 
 
-void main(void)
+int main(void)
 {
 	u8 Local_u8RecStatus;
 
-	RCC_voidInitSysClock();
-	RCC_voidEnableClock(RCC_APB2,USART1_RCC); /* USART1 */
-	RCC_voidEnableClock(RCC_APB2,GPIOA_RCC);  /* PortA  */
-	RCC_voidEnableClock(RCC_AHB,FPEC_RCC);   /* FPEC   */
+	MRCC_VidInit();
+	MRCC_VidEnablePeripheralClock(APB2_BUS,USART1_RCC); /* USART1 */
+	MRCC_VidEnablePeripheralClock(APB2_BUS,GPIOA_RCC);  /* PortA  */
+	MRCC_VidEnablePeripheralClock(AHB_BUS,FPEC_RCC);   /* FPEC   */
 
 
 	MGPIO_VidSetPinDirection(GPIOA,PIN9,OUTPUT_SPEED_10MHZ_AFPP);   /* TX AFPP */
@@ -47,7 +48,7 @@ void main(void)
 
 	MUSART1_voidInit();
 
-	MSTK_ViidInit();
+	MSTK_VidInit();
 
 	MSTK_VidSetCallBack(func);
 
@@ -58,36 +59,38 @@ void main(void)
 	while(u8TimeOutFlag == 0)
 	{
 
-		Local_u8RecValue = MUSART1_u8RecCharSynch( &(u8RecBuffer[u8RecCounter]) );
-		if (Local_u8RecValue != 255)
-		{
-			MSTK_VidStop();
-
-			if(u8RecBuffer[u8RecCounter] == '\n')
-			{
-				if (u8BLWriteReq == 1)
-				{
-					MFPEC_VidEraseFlash();
-					u8BLWriteReq = 0;
-				}
-				
-				/* Parse */
-				Parser_voidParseRecord(u8RecBuffer);
-				MUSART1_VidSendStringSynch("ok");
-				u8RecCounter = 0;
-			}
-
-			else
-			{
-				u8RecCounter ++ ;
-			}
-
-			MSTK_VidStart(15000000);
-		}
-
-		else
-		{
-
-		}
 	}
+	return 0;
 }
+
+		// Local_u8RecValue = MUSART1_u8RecCharSynch( &(u8RecBuffer[u8RecCounter]) );
+		// if (Local_u8RecValue != 255)
+		// {
+		// 	MSTK_VidStop();
+
+		// 	if(u8RecBuffer[u8RecCounter] == '\n')
+		// 	{
+		// 		if (u8BLWriteReq == 1)
+		// 		{
+		// 			MFPEC_VidEraseFlash();
+		// 			u8BLWriteReq = 0;
+		// 		}
+				
+		// 		/* Parse */
+		// 		Parser_voidParseRecord(u8RecBuffer);
+		// 		MUSART1_VidSendStringSynch("ok");
+		// 		u8RecCounter = 0;
+		// 	}
+
+		// 	else
+		// 	{
+		// 		u8RecCounter ++ ;
+		// 	}
+
+		// 	MSTK_VidStart(15000000);
+		// }
+
+		// else
+		// {
+
+		// }
