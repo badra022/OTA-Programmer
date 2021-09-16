@@ -55,26 +55,38 @@ void MFPEC_VidWriteAllFlash(u16* Copy_Binary){
   MFPEC_VidLock();
 }
 
-ErrorStatus MFPEC_VidWriteFlash(u16 Copy_Binary, u16* Copy_targetAddress){
-      ErrorStatus returnState = OK;
-      while(GET_BIT(FLASH->CR, 7) == HIGH){
+void MFPEC_VidWriteFlash(u16* Copy_Binary, u16* Copy_targetAddress){
+  u16 N = sizeof(Copy_Binary)/sizeof(*Copy_Binary);
+
+  /* init the targetAddress to first u16 element of the Binary file (array) */
+  u16* targetAddress = Copy_targetAddress;
+
+  if(N < 100){    /* MAX Buffer size sent */
+    while(GET_BIT(FLASH->CR, 7) == HIGH){
       MFPEC_VidUnLock();
-      }
+    }
 
-      SET_BIT(FLASH->CR, 2); /* Set PG bit to select flashing or Programming Mode */
+    SET_BIT(FLASH->CR, 2); /* Set PG bit to select flashing or Programming Mode */
 
-      *Copy_targetAddress = Copy_Binary;    /* store current character in the target Address in the flash */
+    /* Loop over the Array and Write each u16 value into memory address */
+    /* This part of code can be Asynch by using DMA peripheral */
+    for(u16 i = 0; i<= N; i++){
+      *targetAddress = Copy_Binary[i];    /* store current Byte in the target Address in the flash */
 
       while(GET_BIT(FLASH->SR, 0) == HIGH){}    /* wait BSY flag to be reset */
 
-      if(*Copy_targetAddress != Copy_Binary){ /* check if the value programmed successfully */
-        returnState = NOK;
+      if(*targetAddress == Copy_Binary[i]){ /* check if the value programmed successfully */
+        targetAddress++;      /* move to next character */
+      }
+      else{
+        i--; /* drawBack To same Loop */
       }
 
       SET_BIT(FLASH->SR, 5);    /* clear EOP (End of Operation flag) */
       CLR_BIT(FLASH->CR, 0);    /* this is an important step to Deselect the programming mode if you will execute some normal code between flash writes */
-
-      return returnState;
+    }
+  }
+  MFPEC_VidLock();
 }
 
 static ErrorStatus MFPEC_VidErasePage(u8 Copy_pageID){

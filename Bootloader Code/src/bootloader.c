@@ -45,9 +45,7 @@ int main(void)
 
 	MGPIO_VidSetPinDirection(GPIOA,PIN9,OUTPUT_SPEED_10MHZ_AFPP);   /* TX AFPP */
 	MGPIO_VidSetPinDirection(GPIOA,PIN10,INPUT_FLOATING);  /* RC Input Floating */
-
-	MUSART1_voidInit();
-
+	
 	MSTK_VidInit();
 
 	MSTK_VidSetCallBack(func);

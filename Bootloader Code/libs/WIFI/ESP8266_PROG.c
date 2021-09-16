@@ -28,6 +28,8 @@ void UART_receiveCallBack ( void ){
 
 void ESP8266_VidInit ( void ){
 
+	MUSART_VidInit();
+
 	/* Set USART1 CallBack To Receive The Response Of The ESP8266 */
 	MUSART1_VidSetCallBack( UART_receiveCallBack );
 

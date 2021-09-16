@@ -62,8 +62,7 @@ static void ParseData(u8* Copy_u8BufData)
 		Data[DataCounter] = (DataDigit3 << 8) | (DataDigit2 << 12) | (DataDigit1) | (DataDigit0<<4);
 		DataCounter++;
 	}
-
-	FPEC_voidFlashWrite(Address,Data);
+	MFPEC_VidWriteFlash((u16*)Address, Data);
 }
 
 static void ParseUpperAddress(u8* Copy_u8BufData)

@@ -14,7 +14,7 @@
 /* USART1_Configuration */
 
 #define USART1_STATUS            USART1_ENABLE
-#define USART1_BAUD_RATE         (u32)9600
+#define USART1_BAUD_RATE         (u32)115200        /* speed of esp8266 */
 
 #define USART1_WORD_LENGTH       _8BIT_WORD_LENGTH
 #define USART1_PARITY            PARITY_DISABLE
