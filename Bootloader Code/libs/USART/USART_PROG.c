@@ -53,25 +53,25 @@ void MUSART_VidInit ( void ){
 
 		#endif
 
-		#if  USART1_INTERRUPT == INT_DISABLE
+			#if  USART1_INTERRUPT == INT_DISABLE
 
-					CLR_BIT( MUSART1 -> CR1 , 5 );
-					CLR_BIT( MUSART1 -> CR1 , 6 );
-					CLR_BIT( MUSART1 -> CR1 , 7 );
+						CLR_BIT( MUSART1 -> CR1 , 5 );
+						CLR_BIT( MUSART1 -> CR1 , 6 );
+						CLR_BIT( MUSART1 -> CR1 , 7 );
 
-		#elif USART1_INTERRUPT == TXE_INT_ENABLE
+			#elif USART1_INTERRUPT == TXE_INT_ENABLE
 
-					SET_BIT( MUSART1 -> CR1 , 7 );
+						SET_BIT( MUSART1 -> CR1 , 7 );
 
-		#elif USART1_INTERRUPT == TCE_INT_ENABLE
+			#elif USART1_INTERRUPT == TCE_INT_ENABLE
 
-					SET_BIT( MUSART1 -> CR1 , 6 );
+						SET_BIT( MUSART1 -> CR1 , 6 );
 
-		#elif USART1_INTERRUPT == RXNE_INT_ENABLE
+			#elif USART1_INTERRUPT == RXNE_INT_ENABLE
 
-					SET_BIT( MUSART1 -> CR1 , 5 );
+						SET_BIT( MUSART1 -> CR1 , 5 );
 
-		#endif
+			#endif
 
 		#if   USART1_TRANSMITTER == TRANSMITTER_ENABLE
 
@@ -187,6 +187,23 @@ u8 * MUSART1_PtrReadStringSynch ( void ){
 
 	return ( String );
 
+}
+
+void MUSART1_VidClearFlags(void){
+	MUSART1->SR = 0;
+}
+
+void MUSART1_VidSetINTMode(u8 Copy_INTstate){
+	switch(Copy_INTstate){
+		case INT_DISABLE:
+			CLR_BIT( MUSART1 -> CR1 , 5 );
+			CLR_BIT( MUSART1 -> CR1 , 6 );
+			CLR_BIT( MUSART1 -> CR1 , 7 );
+			break;
+		case TXE_INT_ENABLE: SET_BIT( MUSART1 -> CR1 , 7 );break;
+		case TCE_INT_ENABLE: SET_BIT( MUSART1 -> CR1 , 6 );break;
+		case RXNE_INT_ENABLE: SET_BIT( MUSART1 -> CR1 , 5 );break;
+	}
 }
 
 

@@ -41,7 +41,8 @@ void MUSART1_VidSendStringSynch ( u8 * Copy_ptrString ) ;
 u8   MUSART1_u8RecCharSynch     ( void                ) ;
 u8 * MUSART1_PtrReadStringSynch ( void                ) ;
 void MUSART1_VidSetCallBack     ( void (*ptr) (void)  ) ;
-u8   MUSART1_u8ReadDataRegister (void                 ) ;
-void MUSART1_VidClearFlags      (void                 ) ;
+u8   MUSART1_u8ReadDataRegister ( void                ) ;
+void MUSART1_VidClearFlags      ( void                ) ;
+void MUSART1_VidSetINTMode      (u8 Copy_INTstate     ) ;
 
 #endif /* USART_INTERFACE_H_ */
