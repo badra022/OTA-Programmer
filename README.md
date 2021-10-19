@@ -25,6 +25,8 @@ MEMORY
 }
 ```
   whatever the number in the ```LENGTH``` beside ```FLASH (rx)```, you need to decrease it by **8**, and the ```ORIGIN``` need to be ```ORIGIN = 0x08002000``` which is the start address of your Code in Flash memory
+  
+so it should be look like this
 ```C
   /* Specify the memory areas */
 MEMORY
