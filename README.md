@@ -10,6 +10,7 @@
   * just edit  ```wifi_access.h``` file in ```Bootloader Code\includes``` directory with your **username** and **password**, then reBuild the project by typing ```make``` in your **cmd window** or your **Terminal** opened in ```/Bootloader Code/``` directory
 * Go to the website http://www.bfota.freevar.com/ and select some hex file for the same Microcontroller, then press **Flash** and your file will be uploaded to the server, your Microcontroller shall be notified with the file Now
   * Note that only txt format is accepted in the website so make sure to convert the type ```.hex``` to ```.txt``` for your hex file then upload it
+  * The current version of the website must be uploading the name ```main.txt``` only, so ,make sure to rename your binary file to it
 * wait approx. One Minute and Your Uploaded code will be Up and Running in the Microcontroller 
 
 ### About your Code
