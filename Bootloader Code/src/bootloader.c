@@ -33,10 +33,42 @@ void func(void)
 	addr_to_call();
 }
 
+u8 ascii_to_decimal(u8 Copy_character){
+	if ( (Copy_character >= '0') && (Copy_character <= '9') )
+	{
+		return Copy_character - 48;
+	}
+	else{
+		return -1;
+	}
+}
+
+u8 decimal_to_ascii(u8 Copy_number){
+	if (Copy_number <= 9)
+	{
+		return Copy_number + 48;
+	}
+	return -1;
+}
+
+u8 numBuffer[3];
+u8* number_to_string(u8 Copy_number){
+	if(Copy_number >= 10){
+		numBuffer[0] = decimal_to_ascii(Copy_number/10);
+		numBuffer[1] = decimal_to_ascii(Copy_number%10);
+		numBuffer[2] = '\0';
+	}
+	else{
+		numBuffer[0] = decimal_to_ascii(Copy_number);
+		numBuffer[1] = '\0';
+	}
+	return numBuffer;
+}
 
 u16 volatile Iterator = 0  ;
 u8 volatile numHexLines = 0; /* till the end of the hex file */
 u8 volatile numBatchLines = 0; /* till 30 */
+u16 volatile file_length = -1;		/* will be set from the server */
 u8 DataCome[1400] ;	/* buffer to receive the hex datafile */
 bool volatile READ_FLAG_REQUEST = TRUE;
 bool volatile READ_BINARY_BLOCK_REQUEST = FALSE;
@@ -53,7 +85,7 @@ void ESP8266_Response( void ){
 			numBatchLines++;
 		}
 		if(DataCome[40] != '<'){
-			if(numHexLines >= 244 || numBatchLines >= 30){
+			if(numHexLines >= file_length || numBatchLines >= 30){
 				if (u8BLWriteReq == 1)
 				{
 					MFPEC_VidEraseFlash();
@@ -78,7 +110,7 @@ void ESP8266_Response( void ){
 		MUSART1_VidClearFlags();
 	}
 
-	if(READ_FLAG_REQUEST){
+	else if(READ_FLAG_REQUEST){
 		/* Receive ESP8266 Response */
 		DataCome[ Iterator ] = MUSART1_u8ReadDataRegister();
 		if(Iterator <= 50){
@@ -90,6 +122,31 @@ void ESP8266_Response( void ){
 			}
 			MUSART1_VidClearFlags();
 	}
+}
+
+void setFileLength(u8 idx){
+	file_length = 0x0000;
+	while(DataCome[idx] != '\n' && DataCome[idx] != 'C' && DataCome[idx] != '\r'){
+		file_length *= 10;
+		u8 number = ascii_to_decimal(DataCome[idx]);
+		file_length += number;
+		idx = idx + 1;
+	}
+}
+
+static u8* string_concat(u8* dest, u8* src){
+	u8 idx = 0;
+	while(dest[idx] != '$'){
+		idx++;
+	}
+	u8 idx_src = 0;
+	while(src[idx_src] != '\0'){
+		dest[idx] = src[idx_src];
+		idx++;
+		idx_src++;
+	}
+	dest[idx] = '\0';
+	return dest;
 }
 
 int main(void)
@@ -114,38 +171,40 @@ int main(void)
 
 	while(1)
 	{
-		if(numHexLines >= 220){
-			func();			/* head to the flashed code */
-		}
 		MGPIO_VidSetPinValue(GPIOA, PIN1, LOW);
 
 		dataComeBeginIdx = ESP8266_u8ReceiveHttpReq((u8*)"GET http://bfota.freevar.com/flag.txt", (u8 *)"39");
 
 		if(DataCome[dataComeBeginIdx] == '1')
 		{
+			ESP8266_VidClearBuffer(DataCome);
+			dataComeBeginIdx = ESP8266_u8ReceiveHttpReq((u8*)"GET http://bfota.freevar.com/uploads/", (u8 *)"39");
+			setFileLength(dataComeBeginIdx);
 			READ_BINARY_BLOCK_REQUEST = TRUE;
 			READ_FLAG_REQUEST = FALSE;
 			ESP8266_VidClearBuffer(DataCome);
-			MGPIO_VidSetPinValue(GPIOA, PIN1, HIGH);
-			do{
-			ESP8266_u8ReceiveHttpReq((u8*)"GET http://bfota.freevar.com/parser/?Block=0", (u8 *)"46");
-			ESP8266_VidClearBuffer(DataCome);
-			}while(RESPONSE_STATE == TRUE);
-			MGPIO_VidSetPinValue(GPIOA, PIN1, LOW);
-			ESP8266_u8ReceiveHttpReq((u8*)"GET http://bfota.freevar.com/parser/?Block=1", (u8 *)"46");
-			MGPIO_VidSetPinValue(GPIOA, PIN1, HIGH);
-			ESP8266_u8ReceiveHttpReq((u8*)"GET http://bfota.freevar.com/parser/?Block=2", (u8 *)"46");
-			MGPIO_VidSetPinValue(GPIOA, PIN1, LOW);
-			ESP8266_u8ReceiveHttpReq((u8*)"GET http://bfota.freevar.com/parser/?Block=3", (u8 *)"46");
-			MGPIO_VidSetPinValue(GPIOA, PIN1, HIGH);
-			ESP8266_u8ReceiveHttpReq((u8*)"GET http://bfota.freevar.com/parser/?Block=4", (u8 *)"46");
-			MGPIO_VidSetPinValue(GPIOA, PIN1, LOW);
-			ESP8266_u8ReceiveHttpReq((u8*)"GET http://bfota.freevar.com/parser/?Block=5", (u8 *)"46");
-			MGPIO_VidSetPinValue(GPIOA, PIN1, HIGH);
-			ESP8266_u8ReceiveHttpReq((u8*)"GET http://bfota.freevar.com/parser/?Block=6", (u8 *)"46");
-			MGPIO_VidSetPinValue(GPIOA, PIN1, LOW);
-			ESP8266_u8ReceiveHttpReq((u8*)"GET http://bfota.freevar.com/parser/?Block=7", (u8 *)"46");
-			MGPIO_VidSetPinValue(GPIOA, PIN1, HIGH);
+			u8 blockIdx = 0;
+			while(TRUE){
+				u8* str_idx = number_to_string(blockIdx);
+				u8* command_length = blockIdx >= 10?(u8*)"47":(u8*)"46";
+				do{
+					u8 request[] = "GET http://bfota.freevar.com/parser/?Block=$$";
+					string_concat(request, str_idx);
+					ESP8266_vidSendHttpReq(request, command_length);
+					ESP8266_VidClearBuffer(DataCome);
+				}while(RESPONSE_STATE == TRUE);
+				if(MGPIO_u8GetPinValue(GPIOA, PIN1) == HIGH){
+					MGPIO_VidSetPinValue(GPIOA, PIN1, LOW);
+				}
+				else{
+					MGPIO_VidSetPinValue(GPIOA, PIN1, HIGH);
+				}
+				blockIdx++;
+
+				if(numHexLines >= file_length){
+					func();			/* head to the flashed code */
+				}
+			}
 		}
 		else if(DataCome[dataComeBeginIdx] == '0'){
 			ESP8266_VidClearBuffer(DataCome);

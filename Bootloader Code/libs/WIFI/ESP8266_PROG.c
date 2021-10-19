@@ -87,6 +87,25 @@ u8   ESP8266_u8ReceiveHttpReq( u8 * Copy_Request , u8 * Copy_u8Length ){
 
 }
 
+void   ESP8266_vidSendHttpReq( u8 * Copy_Request, u8 * Copy_u8Length ){
+
+	ESP8266_VidConnectToSrvTcp( (u8 *)"162.253.155.226" , (u8 *)"80" );
+
+	MUSART1_VidSendStringSynch( (u8 *) "AT+CIPSEND=" );
+	MUSART1_VidSendStringSynch( (u8 *) Copy_u8Length );
+	MUSART1_VidSendStringSynch( (u8 *) "\r\n" );
+	_delay_ms( 2000 );
+	MUSART1_VidClearFlags();
+
+	MUSART1_VidSetINTMode(RXNE_INT_ENABLE);
+
+	MUSART1_VidSendStringSynch(Copy_Request);
+	MUSART1_VidSendStringSynch( (u8 *) "\r\n" );
+	_delay_ms( 2000 );
+	MUSART1_VidSetINTMode(INT_DISABLE);
+	MUSART1_VidClearFlags();
+}
+
 void ESP8266_VidClearBuffer ( u8* buffer ){
 
 	u8 LOC_u8Iterator1 = 0 ;
