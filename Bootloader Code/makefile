@@ -21,7 +21,7 @@ INCLUDES = ./includes
 USED_PERIPH = ./libs
 # where to look for external libraries (consisting of .c files and .h files)
 # e.g. PERIPH = GPIO RCC ...
-PERIPH = RCC GPIO AFIO SYSTICK DELAY NVIC USART WIFI FPEC
+PERIPH = RCC GPIO SYSTICK DELAY NVIC USART WIFI FPEC
 # output folder name
 BIN_NAME = bin
 

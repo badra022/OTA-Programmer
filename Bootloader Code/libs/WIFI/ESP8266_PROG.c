@@ -1,8 +1,8 @@
-/***************************************************************************************/
-/****************************  IMT School Training Center ******************************/
-/***************************************************************************************/
-/** This file is developed by IMT School training center, All copyrights are reserved **/
-/***************************************************************************************/
+/*******************************************************************************
+*********** Author		: Ahmed Mohamed Badra
+*********** Date		: 18/10/21			
+*********** Version	: V01					
+******************************************************************************/
 
 #include "TYPES.h"
 #include "MACROS.h"
@@ -64,26 +64,6 @@ void ESP8266_VidConnectToSrvTcp ( u8 * Copy_u8Domain , u8 * Copy_u8Port ){
 
 }
 
-// void ESP8266_VidSendHttpReq( u8 * Copy_u8Key , u8 * Copy_u8Data , u8 * Copy_u8Length ){
-
-// 	ESP8266_VidClearBuffer(DataCome);ESP8266_VidClearBuffer(DataCome);
-
-// 	MUSART1_VidSendStringSynch( (u8 *) "AT+CIPSEND=" );
-// 	MUSART1_VidSendStringSynch( (u8 *) Copy_u8Length );
-// 	MUSART1_VidSendStringSynch( (u8 *) "\r\n" );
-// 	_delay_ms( 4000 );
-
-// 	ESP8266_VidClearBuffer(DataCome);
-
-// 	MUSART1_VidSendStringSynch( (u8 *) "GET /update?api_key=" );
-// 	MUSART1_VidSendStringSynch( (u8 *) Copy_u8Key );
-// 	MUSART1_VidSendStringSynch( (u8 *) "&field1=" );
-// 	MUSART1_VidSendStringSynch( (u8 *) Copy_u8Data );
-// 	MUSART1_VidSendStringSynch( (u8 *) "\r\n" );
-// 	_delay_ms( 20000 );
-
-// }
-
 u8   ESP8266_u8ReceiveHttpReq( u8 * Copy_Request , u8 * Copy_u8Length ){
 
 	ESP8266_VidConnectToSrvTcp( (u8 *)"162.253.155.226" , (u8 *)"80" );
@@ -101,8 +81,6 @@ u8   ESP8266_u8ReceiveHttpReq( u8 * Copy_Request , u8 * Copy_u8Length ){
 	_delay_ms( 2000 );
 	MUSART1_VidSetINTMode(INT_DISABLE);
 	MUSART1_VidClearFlags();
-
-
 
 	/*For bfota.freevar.com ( Array Index )*/
 	return 38;
