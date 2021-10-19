@@ -12,3 +12,27 @@
   * Note that only txt format is accepted in the website so make sure to convert the type ```.hex``` to ```.txt``` for your hex file then upload it
 * wait approx. One Minute and Your Uploaded code will be Up and Running in the Microcontroller 
 
+### About your Code
+
+* head to the ```mem.ld``` or ```stm32_flash.ld``` in your Project and edit the following section
+C```
+  /* Specify the memory areas */
+MEMORY
+{
+  FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 64K
+  RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 20K
+  MEMORY_B1 (rx)  : ORIGIN = 0x60000000, LENGTH = 0K
+}
+```
+  whatever the number in the ```LENGTH``` beside ```FLASH (rx)```, you need to decrease it by **8**, and the ```ORIGIN``` need to be ```ORIGIN = 0x08002000``` which is the start address of your Code in Flash memory
+  C```
+  /* Specify the memory areas */
+MEMORY
+{
+  FLASH (rx)      : ORIGIN = 0x08002000, LENGTH = 56K
+  RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 20K
+  MEMORY_B1 (rx)  : ORIGIN = 0x60000000, LENGTH = 0K
+}
+```
+the reason is that the Bootloader is taking the first **8** pages of your Flash space **i.e. 8 KB**, so the Application shall be flashed in the Remaining space, taking only 56 KB of the 64 KB and starting from ```0x08002000``` instead of ```0x0800000``` , **Leave the Rest of code as it is**
+
