@@ -6,8 +6,13 @@ $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
 
 // Check if file already exists
 if (file_exists($target_file)) {
-  echo "Sorry, file already exists.";
-  $uploadOk = 0;
+  if (!unlink("uploads/main.txt")) { 
+		echo ("the older version cannot be deleted due to an error"); 
+		$uploadOk = 0;
+	} 
+	else { 
+		echo ("older version has been deleted"); 
+	} 
 }
 
 // Check file size
@@ -25,10 +30,12 @@ if($imageFileType != "txt") {
 // Check if $uploadOk is set to 0 by an error
 if ($uploadOk == 0) {
   echo "Sorry, your file was not uploaded.";
+  file_put_contents('flag.txt', '0');
 // if everything is ok, try to upload file
 } else {
   if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
     echo "The file ". htmlspecialchars( basename( $_FILES["fileToUpload"]["name"])). " has been uploaded.";
+	file_put_contents("uploads/length.txt",count(file("uploads/main.txt")));
 	file_put_contents('flag.txt', '1');
   } else {
     echo "Sorry, there was an error uploading your file.";

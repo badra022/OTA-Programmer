@@ -11,7 +11,7 @@ if(file_exists ( "../uploads/main.txt") )
         for($i = $numbers*($b);$i<count($lines)&&$i<$numbers*($b+1);$i++)
         {
         echo $lines[$i];
-		if($i<count($lines))
+		if($i>= count($lines)-1)
 			{
 				file_put_contents('../flag.txt', '0');
 			}	
