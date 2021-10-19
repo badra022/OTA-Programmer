@@ -20,43 +20,43 @@ void MFPEC_VidInit(void){
  /* default (empty) */
 }
 
-void MFPEC_VidWriteAllFlash(u16* Copy_Binary){
-  u16 N = sizeof(Copy_Binary)/sizeof(*Copy_Binary);
+//void MFPEC_VidWriteAllFlash(u16* Copy_Binary){
+//  u16 N = sizeof(Copy_Binary)/sizeof(*Copy_Binary);
+//
+//  /* init the targetAddress to first u16 element of the Binary file (array) */
+//  u16* targetAddress = (u16*)APPLICATION_CODE_FLASH_BASE_ADDRESS;
+//
+//  if(N < 60000){    /* MAX Code Size is 60 Kbytes */
+//    while(GET_BIT(FLASH->CR, 7) == HIGH){
+//      MFPEC_VidUnLock();
+//    }
+//
+//    SET_BIT(FLASH->CR, 2); /* Set PG bit to select flashing or Programming Mode */
+//
+//    /* Loop over the Array and Write each u16 value into memory address */
+//    /* This part of code can be Asynch by using DMA peripheral */
+//    for(u16 i = 0; i<= N; i++){
+//      *targetAddress = Copy_Binary[i];    /* store current character in the target Address in the flash */
+//
+//      while(GET_BIT(FLASH->SR, 0) == HIGH){}    /* wait BSY flag to be reset */
+//
+//      if(*targetAddress == Copy_Binary[i]){ /* check if the value programmed successfully */
+//        targetAddress++;      /* move to next character */
+//      }
+//      else{
+//        i--; /* drawBack To same Loop */
+//      }
+//
+//      SET_BIT(FLASH->SR, 5);    /* clear EOP (End of Operation flag) */
+//      CLR_BIT(FLASH->CR, 0);    /* this is an important step to Deselect the programming mode if you will execute some normal code between flash writes */
+//    }
+//  }
+//
+//  MFPEC_VidLock();
+//}
 
-  /* init the targetAddress to first u16 element of the Binary file (array) */
-  u16* targetAddress = (u16*)APPLICATION_CODE_FLASH_BASE_ADDRESS;
-
-  if(N < 60000){    /* MAX Code Size is 60 Kbytes */
-    while(GET_BIT(FLASH->CR, 7) == HIGH){
-      MFPEC_VidUnLock();
-    }
-
-    SET_BIT(FLASH->CR, 2); /* Set PG bit to select flashing or Programming Mode */
-
-    /* Loop over the Array and Write each u16 value into memory address */
-    /* This part of code can be Asynch by using DMA peripheral */
-    for(u16 i = 0; i<= N; i++){
-      *targetAddress = Copy_Binary[i];    /* store current character in the target Address in the flash */
-
-      while(GET_BIT(FLASH->SR, 0) == HIGH){}    /* wait BSY flag to be reset */
-
-      if(*targetAddress == Copy_Binary[i]){ /* check if the value programmed successfully */
-        targetAddress++;      /* move to next character */
-      }
-      else{
-        i--; /* drawBack To same Loop */
-      }
-
-      SET_BIT(FLASH->SR, 5);    /* clear EOP (End of Operation flag) */
-      CLR_BIT(FLASH->CR, 0);    /* this is an important step to Deselect the programming mode if you will execute some normal code between flash writes */
-    }
-  }
-
-  MFPEC_VidLock();
-}
-
-void MFPEC_VidWriteFlash(u16* Copy_Binary, u16* Copy_targetAddress){
-  u16 N = sizeof(Copy_Binary)/sizeof(*Copy_Binary);
+void MFPEC_VidWriteFlash(u16 Copy_Binary[], u16* Copy_targetAddress, u8 Copy_u8Length){
+  u16 N = Copy_u8Length;
 
   /* init the targetAddress to first u16 element of the Binary file (array) */
   u16* targetAddress = Copy_targetAddress;
@@ -65,13 +65,12 @@ void MFPEC_VidWriteFlash(u16* Copy_Binary, u16* Copy_targetAddress){
     while(GET_BIT(FLASH->CR, 7) == HIGH){
       MFPEC_VidUnLock();
     }
-
-    SET_BIT(FLASH->CR, 2); /* Set PG bit to select flashing or Programming Mode */
-
     /* Loop over the Array and Write each u16 value into memory address */
     /* This part of code can be Asynch by using DMA peripheral */
-    for(u16 i = 0; i<= N; i++){
-      *targetAddress = Copy_Binary[i];    /* store current Byte in the target Address in the flash */
+    for(u16 i = 0; i< N; i++){
+		/* Write Flash Programming */
+		SET_BIT(FLASH->CR,0);
+    	*targetAddress = Copy_Binary[i];    /* store current Byte in the target Address in the flash */
 
       while(GET_BIT(FLASH->SR, 0) == HIGH){}    /* wait BSY flag to be reset */
 
@@ -115,7 +114,7 @@ static ErrorStatus MFPEC_VidErasePage(u8 Copy_pageID){
 }
 
 void MFPEC_VidEraseFlash(void){
-  u8 pageID = 4;    /* begin with fifth Page that is the start Page of the preserved Memory of the Application */
+  u8 pageID = 8;    /* begin with fifth Page that is the start Page of the preserved Memory of the Application */
 
   while(pageID < 64){
     if(MFPEC_VidErasePage(pageID) == OK){       /*  Erase the Page */

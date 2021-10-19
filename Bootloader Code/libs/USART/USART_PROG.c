@@ -206,6 +206,10 @@ void MUSART1_VidSetINTMode(u8 Copy_INTstate){
 	}
 }
 
+u8   MUSART1_u8ReadDataRegister ( void ){
+	return MUSART1->DR;
+}
+
 
 void MUSART1_VidSetCallBack( void (*ptr) (void) ){
 
